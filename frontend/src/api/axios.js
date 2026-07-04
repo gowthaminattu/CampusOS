@@ -4,9 +4,10 @@
 
 import axios from "axios";
 
-// Create a custom Axios instance pointing to our FastAPI backend
+// In development: uses http://localhost:8000
+// In production: uses the VITE_API_URL environment variable (set in Vercel)
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
   headers: {
     "Content-Type": "application/json",
   },
