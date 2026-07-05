@@ -113,6 +113,7 @@ app.add_middleware(
         "https://campus-os.vercel.app",            # Vercel alt domain
         "https://*.vercel.app",                    # Any Vercel preview deployments
         "https://campusos1.onrender.com",          # Render backend (self)
+        "https://campusos-1.onrender.com",         # Render backend (hyphenated self)
     ],
     allow_credentials=True,
     allow_methods=["*"],

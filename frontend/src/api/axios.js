@@ -13,15 +13,12 @@ const getBaseURL = () => {
     return import.meta.env.VITE_API_URL;
   }
   if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      if (window.location.port === "5173") {
-        return "http://localhost:8000";
-      }
-      return window.location.origin;
+    if (window.location.port === "5173") {
+      return "http://localhost:8000";
     }
+    return window.location.origin;
   }
-  return "https://campusos1.onrender.com";
+  return "https://campusos-1.onrender.com";
 };
 
 const api = axios.create({
