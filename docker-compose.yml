@@ -1,0 +1,11 @@
+services:
+  campusos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: campusos
+    ports:
+      - "7860:7860"
+    environment:
+      PORT: 7860
+    restart: unless-stopped

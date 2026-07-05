@@ -13,6 +13,7 @@ export default function StudentManagement() {
   const [students, setStudents] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [deptFilter, setDeptFilter] = useState("All");
   const [yearFilter, setYearFilter] = useState("All");
@@ -42,12 +43,17 @@ export default function StudentManagement() {
 
   const fetchStudents = async () => {
     setLoading(true);
+    setError("");
     try {
       const res = await api.get("/admin/students");
       setStudents(res.data);
       setFiltered(res.data);
-    } catch (_) {}
-    finally { setLoading(false); }
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message || "Failed to load students.";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const showToast = (msg, type = "success") => {
@@ -179,12 +185,42 @@ export default function StudentManagement() {
         {search && ` for "${search}"`}
       </p>
 
+      {/* Error Banner */}
+      {error && (
+        <div style={{
+          padding: "14px 18px",
+          marginBottom: "16px",
+          background: "rgba(239,68,68,0.1)",
+          border: "1px solid rgba(239,68,68,0.5)",
+          borderRadius: "10px",
+          color: "#ef4444",
+          fontSize: "0.9rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "12px",
+        }}>
+          <span>⚠️ {error}</span>
+          <button
+            onClick={fetchStudents}
+            style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", padding: "5px 12px", cursor: "pointer", fontSize: "0.82rem", whiteSpace: "nowrap" }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="mgmt-table-card">
         {loading ? (
           <div className="mgmt-loading">
             <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3 }} />
             <span>Loading students...</span>
+          </div>
+        ) : error ? (
+          <div className="mgmt-empty">
+            <span>⚠️</span>
+            <p>Could not load student data. Check that you are logged in as staff and try again.</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="mgmt-empty">

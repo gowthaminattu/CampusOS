@@ -1,13 +1,31 @@
 // src/api/axios.js
-// Central Axios instance for all API calls.
+// Central Axios instance for all API calls - Version 2.
 // Automatically attaches the JWT token from localStorage to every request.
 
 import axios from "axios";
 
+console.log("Initializing CampusOS API...");
+
 // In development: uses http://localhost:8000
 // In production: uses the VITE_API_URL environment variable (set in Vercel)
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      if (window.location.port === "5173") {
+        return "http://localhost:8000";
+      }
+      return window.location.origin;
+    }
+  }
+  return "https://campusos1.onrender.com";
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000" : "https://campusos1.onrender.com"),
+  baseURL: getBaseURL(),
   headers: {
     "Content-Type": "application/json",
   },

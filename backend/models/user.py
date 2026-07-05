@@ -34,6 +34,8 @@ class User(Base):
     hostel_bookings = relationship("HostelBooking", back_populates="student")
     lab_bookings = relationship("LabBooking", back_populates="student")
     admissions = relationship("AdmissionApplication", back_populates="student")
+    meetings = relationship("Meeting", back_populates="creator")
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
 
 # ---------------------------------------------------------------------------
 # Admission Application model 
@@ -127,3 +129,35 @@ class LabBooking(Base):
 
     student = relationship("User", back_populates="lab_bookings")
     lab = relationship("Lab", back_populates="bookings")
+
+# ---------------------------------------------------------------------------
+# Meeting model
+# ---------------------------------------------------------------------------
+class Meeting(Base):
+    __tablename__ = "meetings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    date = Column(String, nullable=False)       # YYYY-MM-DD
+    time = Column(String, nullable=False)       # HH:MM
+    location = Column(String, nullable=False)
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    creator = relationship("User", back_populates="meetings")
+
+# ---------------------------------------------------------------------------
+# Notification model
+# ---------------------------------------------------------------------------
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    text = Column(String, nullable=False)
+    time = Column(String, nullable=False)       # e.g., "Just now" or "2h ago"
+    read = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="notifications")

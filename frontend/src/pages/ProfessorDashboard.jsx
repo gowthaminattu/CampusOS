@@ -5,6 +5,7 @@ import StudentManagement from "../components/StudentManagement";
 import LabBooking from "../components/LabBooking";
 import Analytics from "../components/Analytics";
 import AdmissionManagement from "../components/AdmissionManagement";
+import MeetingScheduler from "../components/MeetingScheduler";
 
 export default function ProfessorDashboard() {
   const { user } = useAuth();
@@ -20,6 +21,8 @@ export default function ProfessorDashboard() {
         return <Analytics />;
       case "admissions":
         return <AdmissionManagement />;
+      case "meetings":
+        return <MeetingScheduler />;
       default:
         return (
           <div className="dash-page">
@@ -43,7 +46,8 @@ export default function ProfessorDashboard() {
                 { id: "students", icon: "👥", label: "Student Management", color: "#6366f1" },
                 { id: "labs", icon: "🔬", label: "Lab Reservation Control", color: "#10b981" },
                 { id: "analytics", icon: "📊", label: "Platform Analytics & Usage", color: "#a855f7" },
-                { id: "admissions", icon: "📋", label: "Admission Application Processing", color: "#f59e0b" }
+                { id: "admissions", icon: "📋", label: "Admission Application Processing", color: "#f59e0b" },
+                { id: "meetings", icon: "📅", label: "Meeting Scheduler & Updates", color: "#ec4899" }
               ].map((act) => (
                 <button
                   key={act.id}
@@ -71,7 +75,8 @@ export default function ProfessorDashboard() {
           { id: "students", label: "👥 Student Management" },
           { id: "labs", label: "🔬 Lab Booking Management" },
           { id: "analytics", label: "📊 System Analytics" },
-          { id: "admissions", label: "📋 Admission Approvals" }
+          { id: "admissions", label: "📋 Admission Approvals" },
+          { id: "meetings", label: "📅 Meeting Scheduler" }
         ].map((tab) => (
           <button
             key={tab.id}

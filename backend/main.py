@@ -8,10 +8,12 @@ from contextlib import asynccontextmanager
 import os
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from typing import Optional
 
 from database.db import engine, Base
 from models import user as models_user   # noqa: F401 — import triggers table creation
-from routers import auth, hostel, lab, orchestrator, admission, admin
+from routers import auth, hostel, lab, orchestrator, admission, admin, notification, meeting
 
 # ---------------------------------------------------------------------------
 # Seed function — runs once on startup to populate rooms and labs
@@ -105,10 +107,12 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",          # Local Vite dev server
-        "http://localhost:8000",          # Local combined server
-        "https://campus-os.vercel.app",   # Vercel frontend (update after deploy)
-        "https://*.vercel.app",           # Any Vercel preview deployments
+        "http://localhost:5173",                   # Local Vite dev server
+        "http://localhost:8000",                   # Local combined server
+        "https://campus-os-lr7r.vercel.app",       # Vercel production frontend
+        "https://campus-os.vercel.app",            # Vercel alt domain
+        "https://*.vercel.app",                    # Any Vercel preview deployments
+        "https://campusos1.onrender.com",          # Render backend (self)
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -124,6 +128,8 @@ app.include_router(lab.router)
 app.include_router(orchestrator.router)
 app.include_router(admission.router)
 app.include_router(admin.router)
+app.include_router(notification.router)
+app.include_router(meeting.router)
 
 
 @app.get("/health", tags=["Health"])
@@ -133,6 +139,22 @@ def health():
         "status": "running",
         "docs": "/docs",
     }
+
+
+class DebugLogRequest(BaseModel):
+    message: str
+    stack: Optional[str] = None
+
+
+@app.post("/debug/log", tags=["Debug"])
+def debug_log(req: DebugLogRequest):
+    print("======== BROWSER JS ERROR ========")
+    print(req.message)
+    if req.stack:
+        print(req.stack)
+    print("==================================")
+    return {"status": "ok"}
+
 
 
 # ---------------------------------------------------------------------------

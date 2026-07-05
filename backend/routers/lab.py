@@ -13,7 +13,7 @@ from typing import List, Optional
 from datetime import datetime, date
 
 from database.db import get_db
-from models.user import User, Lab, LabBooking
+from models.user import User, Lab, LabBooking, Notification
 from routers.auth import get_current_user
 
 router = APIRouter(prefix="/lab", tags=["Lab Booking"])
@@ -174,6 +174,17 @@ def book_lab(
     db.add(booking)
     db.commit()
     db.refresh(booking)
+
+    # Create notification
+    notif = Notification(
+        user_id=current_user.id,
+        text=f"Lab booking confirmed: {lab.name} on {request.booking_date} at {request.start_time}.",
+        time="Just now",
+        read=False
+    )
+    db.add(notif)
+    db.commit()
+
     return booking
 
 
@@ -207,4 +218,15 @@ def cancel_lab_booking(
 
     booking.status = "cancelled"
     db.commit()
+
+    # Create notification
+    notif = Notification(
+        user_id=current_user.id,
+        text=f"Lab booking for {booking.lab.name} on {booking.booking_date} has been cancelled.",
+        time="Just now",
+        read=False
+    )
+    db.add(notif)
+    db.commit()
+
     return {"message": "Lab booking cancelled", "booking_id": booking_id}

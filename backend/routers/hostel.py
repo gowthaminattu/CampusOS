@@ -12,7 +12,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from database.db import get_db
-from models.user import User, HostelRoom, HostelBooking
+from models.user import User, HostelRoom, HostelBooking, Notification
 from routers.auth import get_current_user
 
 router = APIRouter(prefix="/hostel", tags=["Hostel Booking"])
@@ -114,6 +114,17 @@ def book_room(
     room.is_available = False
     db.commit()
     db.refresh(booking)
+
+    # Create notification
+    notif = Notification(
+        user_id=current_user.id,
+        text=f"Hostel room booking confirmed: Room {room.room_number} ({room.block}).",
+        time="Just now",
+        read=False
+    )
+    db.add(notif)
+    db.commit()
+
     return booking
 
 
@@ -149,4 +160,15 @@ def cancel_booking(
     booking.status = "cancelled"
     booking.room.is_available = True  # Free the room
     db.commit()
+
+    # Create notification
+    notif = Notification(
+        user_id=current_user.id,
+        text=f"Hostel room booking for Room {booking.room.room_number} has been cancelled.",
+        time="Just now",
+        read=False
+    )
+    db.add(notif)
+    db.commit()
+
     return {"message": "Booking cancelled successfully", "booking_id": booking_id}

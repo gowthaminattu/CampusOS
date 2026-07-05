@@ -14,6 +14,8 @@ export default defineConfig({
       "/orchestrator": "http://localhost:8000",
       "/admission": "http://localhost:8000",
       "/admin": "http://localhost:8000",
+      "/meeting": "http://localhost:8000",
+      "/notification": "http://localhost:8000",
     },
   },
 });

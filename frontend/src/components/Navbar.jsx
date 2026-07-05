@@ -4,6 +4,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axios";
 
 const PAGE_TITLES = {
   "/dashboard": "Dashboard",
@@ -17,19 +18,13 @@ const PAGE_TITLES = {
   "/settings": "Settings",
 };
 
-const NOTIFICATIONS = [
-  { id: 1, text: "Your admission application is under review", time: "2h ago", read: false },
-  { id: 2, text: "Lab booking confirmed for tomorrow 2 PM", time: "5h ago", read: false },
-  { id: 3, text: "New semester schedule released", time: "1d ago", read: true },
-];
-
 export default function Navbar({ onMenuToggle }) {
   const { user, logout, isStaff } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
   const profileRef = useRef(null);
 
@@ -47,6 +42,23 @@ export default function Navbar({ onMenuToggle }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get("/notification");
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Failed to fetch notifications", err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
   const unreadCount = notifications.filter((n) => !n.read).length;
   const pageTitle = PAGE_TITLES[location.pathname] || "CampusOS AI";
 
@@ -59,8 +71,13 @@ export default function Navbar({ onMenuToggle }) {
     navigate("/login");
   };
 
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  const markAllRead = async () => {
+    try {
+      await api.post("/notification/read-all");
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch (err) {
+      console.error("Failed to mark all read", err);
+    }
   };
 
   return (

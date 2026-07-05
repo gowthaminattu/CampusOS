@@ -12,7 +12,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from database.db import get_db
-from models.user import User, AdmissionApplication
+from models.user import User, AdmissionApplication, Notification
 from routers.auth import get_current_user
 from routers.admin import require_staff
 
@@ -83,6 +83,17 @@ def apply(
     db.add(application)
     db.commit()
     db.refresh(application)
+
+    # Create notification
+    notif = Notification(
+        user_id=current_user.id,
+        text=f"Your admission application for {request.department} has been submitted.",
+        time="Just now",
+        read=False
+    )
+    db.add(notif)
+    db.commit()
+
     return application
 
 
@@ -131,4 +142,15 @@ def update_status(
     app.status = body.status
     db.commit()
     db.refresh(app)
+
+    # Create notification for student
+    notif = Notification(
+        user_id=app.student_id,
+        text=f"Your admission application status has been updated to '{body.status}' for {app.department}.",
+        time="Just now",
+        read=False
+    )
+    db.add(notif)
+    db.commit()
+
     return app

@@ -53,7 +53,29 @@ Swagger docs: **http://localhost:8000/docs**
 
 ---
 
-## 📁 Project Structure
+## � Deploy to Hugging Face Spaces (Docker)
+
+This project is ready for a Docker-based Hugging Face Space.
+
+### What to use
+- [Dockerfile](Dockerfile) builds the frontend and starts the FastAPI backend.
+- [start.sh](start.sh) launches the app on the port provided by Hugging Face via $PORT.
+- [docker-compose.yml](docker-compose.yml) is available for local testing.
+
+### Space setup
+1. Create a new Hugging Face Space.
+2. Choose the Docker option.
+3. Connect this repository or upload the project files.
+4. Hugging Face will build from [Dockerfile](Dockerfile) automatically.
+5. Set any required environment variables in the Space settings, such as:
+   - DATABASE_URL
+   - GOOGLE_API_KEY (if you use the AI features that depend on it)
+
+The app will be served on port 7860, which is compatible with Hugging Face Spaces.
+
+---
+
+## �📁 Project Structure
 
 ```
 CampusOS/
