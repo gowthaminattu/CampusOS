@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { useAuth } from "../context/AuthContext";
 
 function LabBookingInner() {
   const [labs, setLabs] = useState([]);
@@ -251,7 +250,7 @@ function LabBookingInner() {
             </div>
             {myBookings.map((b) => (
               <div key={b.id} className="history-row">
-                <span className="font-mono">{b.lab.name}</span>
+                <span className="font-mono">{b.lab?.name ?? "—"}</span>
                 <span>{b.booking_date}</span>
                 <span>{b.start_time}–{b.end_time}</span>
                 <span>{b.purpose || "—"}</span>
@@ -274,28 +273,5 @@ function LabBookingInner() {
   );
 }
 
-// Export default wrapper handles the staff guard before rendering the inner component
-export default function LabBooking() {
-  const { isStaff } = useAuth();
-
-  if (!isStaff) {
-    return (
-      <div className="access-denied-page">
-        <div className="access-denied-card">
-          <div className="access-denied-icon">🚫</div>
-          <h2 className="access-denied-title">Access Restricted</h2>
-          <p className="access-denied-msg">
-            Lab booking is only available for <strong>staff and faculty</strong>.
-            <br />
-            Students can request lab access through the AI Assistant or contact your professor.
-          </p>
-          <a href="/chat" className="btn btn-primary" style={{ marginTop: 20, textDecoration: "none" }}>
-            ✦ Ask AI Assistant
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  return <LabBookingInner />;
-}
+// Export the inner component directly — accessible to all authenticated users
+export default LabBookingInner;

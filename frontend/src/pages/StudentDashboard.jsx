@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext";
 import AIChat from "../components/AIChat";
 import Timetable from "../components/Timetable";
 import AdmissionForm from "../components/AdmissionForm";
-import HostelBooking from "../components/HostelBooking"; // or components/Hostel
 import Hostel from "../components/Hostel";
 import Placement from "../components/Placement";
 import EventRegistration from "../components/EventRegistration";

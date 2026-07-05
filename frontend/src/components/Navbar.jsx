@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 // Fixed top navbar — page title, notifications, profile.
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -30,6 +30,22 @@ export default function Navbar({ onMenuToggle }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const notifRef = useRef(null);
+  const profileRef = useRef(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setShowProfile(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const pageTitle = PAGE_TITLES[location.pathname] || "CampusOS AI";
@@ -65,7 +81,7 @@ export default function Navbar({ onMenuToggle }) {
       {/* Right: actions */}
       <div className="topbar-right">
         {/* Notifications */}
-        <div className="topbar-dropdown-wrap">
+        <div className="topbar-dropdown-wrap" ref={notifRef}>
           <button
             id="topbar-notifications"
             type="button"
@@ -100,7 +116,7 @@ export default function Navbar({ onMenuToggle }) {
         </div>
 
         {/* Profile */}
-        <div className="topbar-dropdown-wrap">
+        <div className="topbar-dropdown-wrap" ref={profileRef}>
           <button
             id="topbar-profile"
             type="button"

@@ -4,68 +4,19 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from database.db import engine, Base
 from models import user as models_user   # noqa: F401 — import triggers table creation
 from routers import auth, hostel, lab, orchestrator, admission, admin
 
 # ---------------------------------------------------------------------------
-# Create all database tables on startup (if they don't exist yet)
+# Seed function — runs once on startup to populate rooms and labs
 # ---------------------------------------------------------------------------
-Base.metadata.create_all(bind=engine)
-
-# ---------------------------------------------------------------------------
-# Initialize FastAPI app
-# ---------------------------------------------------------------------------
-app = FastAPI(
-    title="CampusOS API",
-    description="AI-powered campus management platform for college students.",
-    version="1.0.0",
-    docs_url="/docs",      # Swagger UI at http://localhost:8000/docs
-    redoc_url="/redoc",    # ReDoc UI at http://localhost:8000/redoc
-)
-
-# ---------------------------------------------------------------------------
-# CORS — allow the React frontend to call the API
-# ---------------------------------------------------------------------------
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",          # Local Vite dev server
-        "http://localhost:8000",          # Local combined server
-        "https://campus-os.vercel.app",   # Vercel frontend (update after deploy)
-        "https://*.vercel.app",           # Any Vercel preview deployments
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ---------------------------------------------------------------------------
-# Register all routers (each handles a feature area)
-# ---------------------------------------------------------------------------
-app.include_router(auth.router)
-app.include_router(hostel.router)
-app.include_router(lab.router)
-app.include_router(orchestrator.router)
-app.include_router(admission.router)
-app.include_router(admin.router)
-
-
-@app.get("/health", tags=["Health"])
-def health():
-    return {
-        "message": "🎓 Welcome to CampusOS API!",
-        "status": "running",
-        "docs": "/docs",
-    }
-
-
-# ---------------------------------------------------------------------------
-# Seed initial data — runs once to populate rooms and labs
-# ---------------------------------------------------------------------------
-@app.on_event("startup")
-def seed_data():
+def _seed_data():
     """
     Seed the database with sample hostel rooms and labs if they don't exist.
     This runs automatically when the server starts.
@@ -125,12 +76,68 @@ def seed_data():
 
 
 # ---------------------------------------------------------------------------
+# Lifespan — modern replacement for deprecated @app.on_event("startup")
+# ---------------------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: create tables and seed data
+    Base.metadata.create_all(bind=engine)
+    _seed_data()
+    yield
+    # Shutdown: nothing to clean up
+
+
+# ---------------------------------------------------------------------------
+# Initialize FastAPI app
+# ---------------------------------------------------------------------------
+app = FastAPI(
+    title="CampusOS API",
+    description="AI-powered campus management platform for college students.",
+    version="1.0.0",
+    docs_url="/docs",      # Swagger UI at http://localhost:8000/docs
+    redoc_url="/redoc",    # ReDoc UI at http://localhost:8000/redoc
+    lifespan=lifespan,
+)
+
+# ---------------------------------------------------------------------------
+# CORS — allow the React frontend to call the API
+# ---------------------------------------------------------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",          # Local Vite dev server
+        "http://localhost:8000",          # Local combined server
+        "https://campus-os.vercel.app",   # Vercel frontend (update after deploy)
+        "https://*.vercel.app",           # Any Vercel preview deployments
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ---------------------------------------------------------------------------
+# Register all routers (each handles a feature area)
+# ---------------------------------------------------------------------------
+app.include_router(auth.router)
+app.include_router(hostel.router)
+app.include_router(lab.router)
+app.include_router(orchestrator.router)
+app.include_router(admission.router)
+app.include_router(admin.router)
+
+
+@app.get("/health", tags=["Health"])
+def health():
+    return {
+        "message": "🎓 Welcome to CampusOS API!",
+        "status": "running",
+        "docs": "/docs",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Serve React Frontend static assets on port 8000
 # ---------------------------------------------------------------------------
-import os
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
 frontend_dist_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend/dist"))
 
 if os.path.exists(frontend_dist_path):

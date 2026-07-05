@@ -3,7 +3,7 @@
 // Animated background, glassmorphism card, remember me, forgot password.
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
@@ -234,9 +234,9 @@ export default function Login() {
         <div className="login-footer">
           <p>
             Don't have an account?{" "}
-            <a href="/register" className="login-footer-link">
+            <Link to="/register" className="login-footer-link">
               Register here
-            </a>
+            </Link>
           </p>
           <p className="login-footer-note">
             🔒 Secured with JWT authentication

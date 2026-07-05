@@ -95,7 +95,7 @@ export default function HostelBooking() {
       {success && <div className="alert alert-success">✅ {success}</div>}
 
       {/* Active booking banner */}
-      {activeBooking && (
+      {activeBooking && activeBooking.room && (
         <div className="active-booking-banner">
           <div>
             <p className="banner-label">Your Current Room</p>
@@ -223,8 +223,8 @@ export default function HostelBooking() {
             </div>
             {myBookings.map((b) => (
               <div key={b.id} className="history-row">
-                <span className="font-mono">{b.room.room_number}</span>
-                <span>{b.room.block}</span>
+                <span className="font-mono">{b.room?.room_number ?? "—"}</span>
+                <span>{b.room?.block ?? "—"}</span>
                 <span>{b.check_in_date}</span>
                 <span className={`status-badge ${b.status === "confirmed" ? "status-confirmed" : "status-cancelled"}`}>
                   {b.status}

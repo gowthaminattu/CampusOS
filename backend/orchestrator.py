@@ -68,10 +68,11 @@ def parse_intents(message: str) -> list:
         elif any(w in s_lower for w in ["event", "events", "hackathon", "register event"]):
             routes.append(("event", seg))
         # 5. Library Assistant Agent
-        elif any(w in s_lower for w in ["library", "book", "books", "due date", "borrowed"]):
-            # Avoid library clash with "book lab" or "book room"
-            if not any(x in s_lower for x in ["lab", "room", "hostel"]):
-                routes.append(("library", seg))
+        elif any(w in s_lower for w in ["library", "due date", "borrowed", "return book", "renew book"]):
+            routes.append(("library", seg))
+        # Also catch standalone "books" keyword (not part of lab/hostel booking)
+        elif "book" in s_lower and not any(x in s_lower for x in ["lab", "room", "hostel", "book lab", "book room", "book hostel"]):
+            routes.append(("library", seg))
         # 6. Hostel Management Agent
         elif any(w in s_lower for w in ["hostel", "room", "complaint", "warden", "maintenance"]):
             # Avoid hostel clash with "book lab" or "book room" where room might refer to lab

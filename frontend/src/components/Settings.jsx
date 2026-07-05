@@ -29,11 +29,20 @@ export default function Settings() {
       return;
     }
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setSaving(false);
-    setPwSuccess(true);
-    setPwForm({ current: "", newPw: "", confirm: "" });
-    setTimeout(() => setPwSuccess(false), 3000);
+    setPwError("");
+    try {
+      await api.put("/auth/change-password", {
+        current_password: pwForm.current,
+        new_password: pwForm.newPw,
+      });
+      setPwSuccess(true);
+      setPwForm({ current: "", newPw: "", confirm: "" });
+      setTimeout(() => setPwSuccess(false), 3000);
+    } catch (err) {
+      setPwError(err.response?.data?.detail || "Failed to change password. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const settingsTabs = [

@@ -71,7 +71,7 @@ export default function Register() {
           <button
             type="button"
             className={`login-tab ${activeTab === "student" ? "login-tab-active" : ""}`}
-            onClick={() => { setActiveTab("student"); setError(""); }}
+            onClick={() => { setActiveTab("student"); setError(""); setFormData(prev => ({ ...prev, roll_number: "", year: "" })); }}
           >
             <span>🎒</span>
             Student
@@ -80,7 +80,7 @@ export default function Register() {
             type="button"
             className={`login-tab ${activeTab === "staff" ? "login-tab-active" : ""}`}
             style={activeTab === "staff" ? { background: "var(--grad-purple)", boxShadow: "0 4px 16px rgba(168,85,247,0.4)" } : {}}
-            onClick={() => { setActiveTab("staff"); setError(""); }}
+            onClick={() => { setActiveTab("staff"); setError(""); setFormData(prev => ({ ...prev, roll_number: "", year: "" })); }}
           >
             <span>👨‍🏫</span>
             Staff / Faculty
