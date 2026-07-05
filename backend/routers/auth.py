@@ -21,9 +21,19 @@ from models.user import User
 # ---------------------------------------------------------------------------
 # Configuration — change SECRET_KEY in production!
 # ---------------------------------------------------------------------------
+from dotenv import load_dotenv
+load_dotenv()
+
 SECRET_KEY = os.environ.get("SECRET_KEY", "campusos-super-secret-key-2024")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+
+# Load expiration delta dynamically
+expire_seconds = os.environ.get("ACCESS_TOKEN_EXPIRE_SECONDS")
+if expire_seconds:
+    ACCESS_TOKEN_EXPIRE_DELTA = timedelta(seconds=int(expire_seconds))
+else:
+    expire_minutes = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24))
+    ACCESS_TOKEN_EXPIRE_DELTA = timedelta(minutes=expire_minutes)
 
 # OAuth2 scheme — looks for "Authorization: Bearer <token>" header
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -158,7 +168,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     token = create_access_token(
         data={"sub": str(user.id)},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        expires_delta=ACCESS_TOKEN_EXPIRE_DELTA,
     )
     return {"access_token": token, "token_type": "bearer", "user": user}
 
