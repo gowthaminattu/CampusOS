@@ -7,7 +7,7 @@ import axios from "axios";
 // In development: uses http://localhost:8000
 // In production: uses the VITE_API_URL environment variable (set in Vercel)
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000" : "https://campusos1.onrender.com"),
   headers: {
     "Content-Type": "application/json",
   },
