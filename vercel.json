@@ -2,9 +2,23 @@
   "services": {
     "frontend": {
       "root": "frontend/"
+    },
+    "backend": {
+      "root": "backend/",
+      "entrypoint": "main:app"
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": { "service": "frontend" } }
+    { "source": "/auth/:path*",        "destination": { "service": "backend" } },
+    { "source": "/hostel/:path*",      "destination": { "service": "backend" } },
+    { "source": "/lab/:path*",         "destination": { "service": "backend" } },
+    { "source": "/admission/:path*",   "destination": { "service": "backend" } },
+    { "source": "/admin/:path*",       "destination": { "service": "backend" } },
+    { "source": "/orchestrator/:path*","destination": { "service": "backend" } },
+    { "source": "/health",             "destination": { "service": "backend" } },
+    { "source": "/docs",               "destination": { "service": "backend" } },
+    { "source": "/redoc",              "destination": { "service": "backend" } },
+    { "source": "/openapi.json",       "destination": { "service": "backend" } },
+    { "source": "/(.*)",               "destination": { "service": "frontend" } }
   ]
 }

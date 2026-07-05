@@ -13,13 +13,15 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 import bcrypt
 
+import os
+
 from database.db import get_db
 from models.user import User
 
 # ---------------------------------------------------------------------------
 # Configuration — change SECRET_KEY in production!
 # ---------------------------------------------------------------------------
-SECRET_KEY = "campusos-super-secret-key-2024"
+SECRET_KEY = os.environ.get("SECRET_KEY", "campusos-super-secret-key-2024")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
