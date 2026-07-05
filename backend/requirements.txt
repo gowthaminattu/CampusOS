@@ -6,3 +6,5 @@ passlib[bcrypt]
 python-multipart
 pydantic[email]
 python-dateutil
+
+google-genai
