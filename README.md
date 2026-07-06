@@ -84,7 +84,7 @@ Event recommendations and registrations
 
 General student query handling
 
- ## Advanced Analytics Dashboard**
+ ## Advanced Analytics Dashboard
 
 Provides administrators with:
 
