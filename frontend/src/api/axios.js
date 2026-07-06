@@ -4,7 +4,7 @@
 
 import axios from "axios";
 
-console.log("Initializing CampusOS API...");
+console.log("Initializing CampusOS API - V3...");
 
 // In development: uses http://localhost:8000
 // In production: uses the VITE_API_URL environment variable (set in Vercel)
@@ -18,7 +18,7 @@ const getBaseURL = () => {
     }
     return window.location.origin;
   }
-  return "https://campusos-1.onrender.com";
+  return "https://campusos-2.onrender.com";
 };
 
 const api = axios.create({
