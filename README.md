@@ -25,7 +25,7 @@ cd ../backend
 uvicorn main:app --reload
 ```
 
-Open **http://localhost:8000** — done!
+Open **https://campusos-2.onrender.com** — done!
 
 ---
 
