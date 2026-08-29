@@ -59,11 +59,11 @@ const DEFAULT_ATS_RESULT = {
 
 export default function ResumeAnalyzer() {
   const [activeInputTab, setActiveInputTab] = useState("UPLOAD"); // "UPLOAD" | "PASTE"
-  const [resumeText, setResumeText] = useState(SAMPLE_RESUMES["Full Stack Dev"]);
+  const [resumeText, setResumeText] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(DEFAULT_ATS_RESULT);
+  const [result, setResult] = useState(null);
 
   // File Upload Handler
   const handleFileUpload = (e) => {
@@ -155,9 +155,11 @@ export default function ResumeAnalyzer() {
           {Object.keys(SAMPLE_RESUMES).map((sampleName) => (
             <button
               key={sampleName}
+              type="button"
               onClick={() => {
                 setResumeText(SAMPLE_RESUMES[sampleName]);
                 setUploadedFile(null);
+                setResult(null);
               }}
               className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold transition"
             >
@@ -310,8 +312,20 @@ export default function ResumeAnalyzer() {
         </div>
 
         {/* Right Column: ATS Score Report & Analytics Dashboard */}
-        <div className="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-6 shadow-xl">
-          {result && (
+        <div className="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-6 shadow-xl flex flex-col justify-center">
+          {!result ? (
+            <div className="p-12 text-center text-slate-400 font-mono flex flex-col items-center justify-center space-y-4 min-h-[380px]">
+              <div className="p-5 rounded-3xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-lg">
+                <FileText className="w-12 h-12" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-white font-heading">No Resume Analyzed Yet</h3>
+                <p className="text-xs text-slate-400 max-w-sm leading-relaxed font-sans">
+                  Upload your resume document or paste text on the left, then click <strong className="text-emerald-400">"Run Full ATS Scoring Analysis"</strong> to generate your score.
+                </p>
+              </div>
+            </div>
+          ) : (
             <div className="space-y-6 font-mono">
               {/* Overall Composite Score Ring & Tier Badge */}
               <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/50 to-slate-900 border border-indigo-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-lg">
