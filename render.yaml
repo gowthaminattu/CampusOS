@@ -1,0 +1,21 @@
+services:
+  # Static Site for Frontend React App
+  - type: web
+    name: campusos-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # Java Spring Boot Backend Service
+  - type: web
+    name: campusos-backend
+    env: java
+    buildCommand: cd backend && ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+    startCommand: cd backend && java -jar target/campusos-backend-2.0.0.jar
+    envVars:
+      - key: PORT
+        value: 8000
