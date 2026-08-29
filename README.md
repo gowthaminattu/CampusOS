@@ -1,17 +1,9 @@
-Sure. I removed the **License** and **Screenshots** sections. Here is the updated README:
+Sure. Here is the **single complete README** with the navigation links, screenshots, and license sections removed.
 
 # CampusOS — AI-Powered Campus Operating System
 
 <p align="center">
   <strong>One Intelligent Platform. Every Campus Workflow. Smarter Education.</strong>
-</p>
-
-<p align="center">
-  <a href="https://campusos-ai-cycp.onrender.com/dashboard">Live Demo</a> •
-  <a href="#features">Features</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#tech-stack">Tech Stack</a> •
-  <a href="#installation">Installation</a>
 </p>
 
 ---
@@ -55,7 +47,7 @@ Management ───┘
 
 ---
 
-# Key Highlights
+## Key Highlights
 
 ### AI-Powered Campus Assistance
 
@@ -296,7 +288,7 @@ CampusOS can streamline the student admission workflow.
 
 The analytics layer provides administrators with a centralized view of campus operations.
 
-Possible insights include:
+### Insights
 
 * Student statistics
 * Service usage
@@ -355,7 +347,7 @@ CampusOS follows a modular full-stack architecture.
 └───────────────────────────────────────────┘
 ```
 
-The architecture is designed to keep the frontend, backend, business logic, and AI services modular.
+The architecture is designed to keep the frontend, backend, business logic, and AI services modular and scalable.
 
 ---
 
@@ -367,8 +359,8 @@ The architecture is designed to keep the frontend, backend, business logic, and 
 | Build Tool           | Vite                          |
 | Backend              | FastAPI                       |
 | Programming Language | Python                        |
-| API                  | REST                          |
-| AI Layer             | AI-powered Agent Architecture |
+| API                  | REST API                      |
+| AI Layer             | AI-Powered Agent Architecture |
 | Database             | SQL / Database Layer          |
 | Development          | VS Code                       |
 | Version Control      | Git & GitHub                  |
@@ -569,7 +561,7 @@ CampusOS/
 
 CampusOS follows a role-based approach to application access.
 
-Key security considerations include:
+### Security Considerations
 
 * Authentication
 * Role-based authorization
