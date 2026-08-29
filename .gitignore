@@ -12,6 +12,16 @@ venv/
 env/
 campusos.db
 
+# Java & Maven
+target/
+*.class
+*.jar
+*.war
+maven/
+campusos_h2_db*
+*.mv.db
+*.trace.db
+
 # Node
 node_modules/
 dist/

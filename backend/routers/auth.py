@@ -58,13 +58,17 @@ class UserResponse(BaseModel):
     id: int
     name: str
     email: str
-    roll_number: str
-    department: Optional[str]
-    year: Optional[int]
+    roll_number: Optional[str] = None
+    department: Optional[str] = None
+    year: Optional[int] = None
     role: str
-    gpa: Optional[float]
-    attendance: Optional[float]
-    phone: Optional[str]
+    gpa: Optional[float] = 0.0
+    attendance: Optional[float] = 0.0
+    phone: Optional[str] = None
+    target_role: Optional[str] = "Software Developer"
+    github_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    portfolio_url: Optional[str] = None
 
     class Config:
         from_attributes = True  # Allows converting SQLAlchemy objects to Pydantic
@@ -120,6 +124,28 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
+
+
+def require_roles(allowed_roles: list[str]):
+    """
+    Factory dependency for role-based authorization.
+    Usage: `Depends(require_roles(["tpo", "admin"]))`
+    """
+    def role_checker(current_user: User = Depends(get_current_user)) -> User:
+        # Map legacy 'staff' to 'faculty' and 'admin' for backward compatibility
+        user_role = current_user.role.lower() if current_user.role else "student"
+        effective_roles = [user_role]
+        if user_role == "staff":
+            effective_roles.extend(["faculty", "admin", "tpo"])
+
+        if not any(r in allowed_roles for r in effective_roles):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Role '{current_user.role}' is not authorized to perform this action.",
+            )
+        return current_user
+    return role_checker
+
 
 
 # ---------------------------------------------------------------------------

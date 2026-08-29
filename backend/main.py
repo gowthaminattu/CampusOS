@@ -16,18 +16,21 @@ from typing import Optional
 
 from database.db import engine, Base
 from models import user as models_user   # noqa: F401 — import triggers table creation
-from routers import auth, hostel, lab, orchestrator, admission, admin, notification, meeting
+from routers import (
+    auth, hostel, lab, orchestrator, admission, admin, notification, meeting,
+    employability, skill_gap, placement, mock_interview, resume, at_risk, library, audit
+)
 
 # ---------------------------------------------------------------------------
-# Seed function — runs once on startup to populate rooms and labs
+# Seed function — runs once on startup to populate rooms, labs, companies, and books
 # ---------------------------------------------------------------------------
 def _seed_data():
     """
-    Seed the database with sample hostel rooms and labs if they don't exist.
-    This runs automatically when the server starts.
+    Seed the database with sample hostel rooms, labs, companies, job drives, and library books.
     """
     from database.db import SessionLocal
-    from models.user import HostelRoom, Lab
+    from models.user import HostelRoom, Lab, Company, JobDrive, LibraryBook, User, StudentSkill
+    from routers.auth import hash_password
 
     db = SessionLocal()
     try:
@@ -65,14 +68,80 @@ def _seed_data():
                 Lab(name="Networks Lab", location="Block B, Room 202", capacity=20,
                     equipment="Cisco Routers, Packet Tracer, Wireshark", is_active=True),
                 Lab(name="AI/ML Lab", location="Block C, Room 301", capacity=20,
-                    equipment="GPU Workstations, TensorFlow, PyTorch, CUDA", is_active=True),
+                    equipment="GPU Workstations, TensorFlow, PyTorch, CUDA", is_restricted=True, is_active=True),
                 Lab(name="Electronics Lab", location="Block C, Room 302", capacity=30,
                     equipment="Oscilloscopes, Multimeters, Breadboards, Arduino", is_active=True),
             ]
             db.add_all(labs)
 
+        # Seed Companies & Placement Drives
+        if db.query(Company).count() == 0:
+            c1 = Company(name="Amazon", industry="Cloud & E-Commerce", location="Bengaluru", website="https://amazon.jobs")
+            c2 = Company(name="Google", industry="Software & Internet", location="Hyderabad", website="https://careers.google.com")
+            c3 = Company(name="TCS", industry="IT Services", location="Mumbai", website="https://tcs.com")
+            db.add_all([c1, c2, c3])
+            db.commit()
+
+            d1 = JobDrive(company_id=c1.id, title="SDE-1 Graduate Drive 2026", role="Software Development Engineer",
+                          description="Looking for strong algorithms, Java/Python, and Distributed Systems basics.",
+                          min_cgpa=7.5, max_backlogs=0, allowed_branches="CSE,ECE,IT", required_skills="Java, OOP, DSA, SQL, REST API", package_lpa=28.5, location="Bengaluru", drive_date="2026-09-10", status="Active")
+            d2 = JobDrive(company_id=c2.id, title="Software Engineer Campus Hire", role="Software Engineer",
+                          description="Focus on System Design, Data Structures, and Clean Code principles.",
+                          min_cgpa=8.0, max_backlogs=0, allowed_branches="CSE,IT", required_skills="Python, C++, DSA, System Design", package_lpa=36.0, location="Hyderabad", drive_date="2026-09-25", status="Active")
+            d3 = JobDrive(company_id=c3.id, title="Ninja & Digital Hiring", role="System Engineer",
+                          description="Core software development and IT infrastructure roles.",
+                          min_cgpa=6.0, max_backlogs=1, allowed_branches="CSE,ECE,EEE,MECH,CIVIL,IT", required_skills="Java, SQL, Git", package_lpa=7.0, location="Pan India", drive_date="2026-08-30", status="Active")
+            db.add_all([d1, d2, d3])
+
+        # Seed Library Books
+        if db.query(LibraryBook).count() == 0:
+            books = [
+                LibraryBook(title="Introduction to Algorithms (CLRS)", author="Cormen, Leiserson, Rivest, Stein", isbn="9780262033848", category="Computer Science", total_copies=6, available_copies=5),
+                LibraryBook(title="Clean Code: A Handbook of Agile Software Craftsmanship", author="Robert C. Martin", isbn="9780132350884", category="Software Engineering", total_copies=4, available_copies=4),
+                LibraryBook(title="Design Patterns: Elements of Reusable Object-Oriented Software", author="Erich Gamma et al.", isbn="9780201633610", category="Software Architecture", total_copies=5, available_copies=3),
+                LibraryBook(title="Database System Concepts", author="Silberschatz, Korth, Sudarshan", isbn="9780073523323", category="Database", total_copies=8, available_copies=7),
+            ]
+            db.add_all(books)
+
+        # Seed demo users for 4 roles if none exist
+        if db.query(User).filter(User.email == "student@campusos.com").count() == 0:
+            demo_student = User(
+                name="Aarav Sharma", email="student@campusos.com", roll_number="21CS001",
+                hashed_password=hash_password("student123"), department="CSE", year=4, role="student",
+                gpa=8.4, attendance=88.5, arrears=0, target_role="Java Developer"
+            )
+            demo_faculty = User(
+                name="Dr. Rajesh Kumar", email="faculty@campusos.com", roll_number="FAC01",
+                hashed_password=hash_password("faculty123"), department="CSE", year=None, role="faculty"
+            )
+            demo_tpo = User(
+                name="Priya Nair (TPO Officer)", email="tpo@campusos.com", roll_number="TPO01",
+                hashed_password=hash_password("tpo123"), department="Placement Cell", year=None, role="tpo"
+            )
+            demo_admin = User(
+                name="System Administrator", email="admin@campusos.com", roll_number="ADM01",
+                hashed_password=hash_password("admin123"), department="Administration", year=None, role="admin"
+            )
+            db.add_all([demo_student, demo_faculty, demo_tpo, demo_admin])
+            db.commit()
+
+            # Seed skills for demo student
+            skills_data = [
+                ("Java", "Technical", 82.0),
+                ("OOP", "Technical", 86.0),
+                ("DSA", "Coding", 68.0),
+                ("SQL", "Technical", 76.0),
+                ("REST API", "Technical", 65.0),
+                ("Spring Boot", "Technical", 48.0),
+                ("Git", "Technical", 72.0),
+                ("Quantitative Aptitude", "Aptitude", 74.0),
+                ("Communication", "Soft", 80.0),
+            ]
+            for sk_name, sk_cat, sk_score in skills_data:
+                db.add(StudentSkill(student_id=demo_student.id, skill_name=sk_name, category=sk_cat, score=sk_score))
+
         db.commit()
-        print("Database seeded with rooms and labs.")
+        print("Database seeded with rooms, labs, companies, books, and demo accounts.")
     except Exception as e:
         print(f"Seeding error: {e}")
         db.rollback()
@@ -96,9 +165,9 @@ async def lifespan(app: FastAPI):
 # Initialize FastAPI app
 # ---------------------------------------------------------------------------
 app = FastAPI(
-    title="CampusOS API",
-    description="AI-powered campus management platform for college students.",
-    version="1.0.0",
+    title="CampusOS API 2.0",
+    description="AI-Powered Student Success & Placement Intelligence Platform",
+    version="2.0.0",
     docs_url="/docs",      # Swagger UI at http://localhost:8000/docs
     redoc_url="/redoc",    # ReDoc UI at http://localhost:8000/redoc
     lifespan=lifespan,
@@ -135,6 +204,17 @@ app.include_router(admission.router)
 app.include_router(admin.router)
 app.include_router(notification.router)
 app.include_router(meeting.router)
+
+# CampusOS 2.0 New Routers
+app.include_router(employability.router)
+app.include_router(skill_gap.router)
+app.include_router(placement.router)
+app.include_router(mock_interview.router)
+app.include_router(resume.router)
+app.include_router(at_risk.router)
+app.include_router(library.router)
+app.include_router(audit.router)
+
 
 
 @app.get("/health", tags=["Health"])

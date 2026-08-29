@@ -1,178 +1,159 @@
 // src/components/Navbar.jsx
-// Fixed top navbar — page title, notifications, profile.
+// Fixed Topbar for CampusOS with Ctrl + K Command Palette Trigger
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Search, Command, Bell, User, LogOut, Settings, Menu, Sparkles, CheckCircle2 } from "lucide-react";
 import api from "../api/axios";
 
 const PAGE_TITLES = {
-  "/dashboard": "Dashboard",
-  "/chat": "AI Assistant",
-  "/admission": "Admission Application",
-  "/hostel": "Hostel Booking",
-  "/students": "Student Management",
-  "/lab": "Lab Booking",
-  "/analytics": "Analytics",
-  "/admission-mgmt": "Admission Management",
+  "/dashboard": "Command Center",
+  "/attendance": "Attendance & Academic Health",
+  "/performance": "Academic Performance & GPA",
+  "/timetable": "Smart Timetable",
+  "/chat": "Campus Intelligence AI",
+  "/id-card": "Digital Student ID",
+  "/fees": "Fee Management & Receipts",
+  "/complaints": "Campus Helpdesk & Issues",
+  "/placement": "Placement Drives",
+  "/hostel": "Hostel Management",
+  "/library": "Library System",
+  "/lab": "Lab Allocations",
+  "/students": "Student Directory",
   "/settings": "Settings",
 };
 
-export default function Navbar({ onMenuToggle }) {
-  const { user, logout, isStaff } = useAuth();
+export default function Navbar({ onMenuToggle, onOpenCommandPalette }) {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: "Attendance Health: Digital Electronics is at 76%", time: "10m ago", read: false },
+    { id: 2, text: "New Notice: Annual Hackathon 2026 Registration Open", time: "1h ago", read: false },
+  ]);
+
   const notifRef = useRef(null);
   const profileRef = useRef(null);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotifications(false);
-      }
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setShowProfile(false);
-      }
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false);
+      if (profileRef.current && !profileRef.current.contains(e.target)) setShowProfile(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const fetchNotifications = async () => {
-    try {
-      const res = await api.get("/notification");
-      setNotifications(res.data);
-    } catch (err) {
-      console.error("Failed to fetch notifications", err);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchNotifications();
-      const interval = setInterval(fetchNotifications, 15000);
-      return () => clearInterval(interval);
-    }
-  }, [user]);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
-  const pageTitle = PAGE_TITLES[location.pathname] || "CampusOS AI";
-
-  const initials = user?.name
-    ? user.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
-    : "U";
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
-  const markAllRead = async () => {
-    try {
-      await api.post("/notification/read-all");
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch (err) {
-      console.error("Failed to mark all read", err);
-    }
-  };
+  const pageTitle = PAGE_TITLES[location.pathname] || "CampusOS Intelligence";
 
   return (
-    <header className="topbar">
-      {/* Left: hamburger + page title */}
-      <div className="topbar-left">
-        <button className="topbar-menu-btn" type="button" onClick={onMenuToggle}>
-          <span /><span /><span />
+    <header className="topbar flex items-center justify-between px-6 py-3 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30">
+      {/* Left: Menu toggle + Page Title */}
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={onMenuToggle}
+          className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+        >
+          <Menu className="w-4 h-4" />
         </button>
-        <div className="topbar-title-wrap">
-          <h2 className="topbar-title">{pageTitle}</h2>
-          <span className="topbar-breadcrumb">
+        <div>
+          <h2 className="text-base font-bold text-white font-heading">{pageTitle}</h2>
+          <span className="text-[10px] font-mono text-slate-500">
             CampusOS AI › {pageTitle}
           </span>
         </div>
       </div>
 
-      {/* Right: actions */}
-      <div className="topbar-right">
-        {/* Notifications */}
-        <div className="topbar-dropdown-wrap" ref={notifRef}>
+      {/* Middle: Command Palette Trigger Button (Ctrl + K) */}
+      <div className="hidden md:flex flex-1 max-w-md mx-6">
+        <button
+          onClick={onOpenCommandPalette}
+          className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 text-slate-400 hover:text-slate-200 text-xs transition font-mono shadow-inner"
+        >
+          <span className="flex items-center gap-2">
+            <Search className="w-3.5 h-3.5 text-indigo-400" /> Search commands, courses, fees...
+          </span>
+          <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] border border-slate-700">
+            Ctrl K
+          </span>
+        </button>
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-3">
+        {/* Command Palette Mobile Trigger Icon */}
+        <button
+          onClick={onOpenCommandPalette}
+          className="md:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+
+        {/* Notifications Popover */}
+        <div className="relative" ref={notifRef}>
           <button
-            id="topbar-notifications"
-            type="button"
-            className="topbar-icon-btn"
-            onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false); }}
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition"
           >
-            🔔
-            {unreadCount > 0 && (
-              <span className="topbar-badge">{unreadCount}</span>
-            )}
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-500" />
           </button>
 
           {showNotifications && (
-            <div className="topbar-dropdown notif-dropdown">
-              <div className="notif-header">
-                <span>Notifications</span>
-                <button onClick={markAllRead} className="notif-mark-read">
-                  Mark all read
-                </button>
+            <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl space-y-3 z-50">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span className="text-xs font-bold text-white font-heading">Notifications</span>
+                <span className="text-[10px] font-mono text-indigo-400">2 New</span>
               </div>
-              {notifications.map((n) => (
-                <div key={n.id} className={`notif-item ${!n.read ? "notif-unread" : ""}`}>
-                  <div className="notif-dot" />
-                  <div className="notif-body">
-                    <p className="notif-text">{n.text}</p>
-                    <span className="notif-time">{n.time}</span>
+              <div className="space-y-2">
+                {notifications.map((n) => (
+                  <div key={n.id} className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs">
+                    <p className="text-slate-200">{n.text}</p>
+                    <span className="text-[10px] font-mono text-slate-500 mt-1 block">{n.time}</span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Profile */}
-        <div className="topbar-dropdown-wrap" ref={profileRef}>
+        {/* User Profile Dropdown */}
+        <div className="relative" ref={profileRef}>
           <button
-            id="topbar-profile"
-            type="button"
-            className="topbar-avatar-btn"
-            onClick={() => { setShowProfile(!showProfile); setShowNotifications(false); }}
+            onClick={() => setShowProfile(!showProfile)}
+            className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition"
           >
-            <div className="topbar-avatar">{initials}</div>
-            <div className="topbar-user-meta">
-              <span className="topbar-username">{user?.name?.split(" ")[0] || "User"}</span>
-              <span className={`topbar-role ${isStaff ? "role-staff-text" : "role-student-text"}`}>
-                {isStaff ? "Professor" : "Student"}
-              </span>
+            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-xs">
+              {(user?.name || "Gowthami").charAt(0)}
             </div>
-            <span className="topbar-chevron">▾</span>
+            <span className="text-xs font-bold text-white hidden sm:inline">{user?.name || "Gowthami"}</span>
           </button>
 
           {showProfile && (
-            <div className="topbar-dropdown profile-dropdown">
-              <div className="profile-dd-header">
-                <div className="profile-dd-avatar">{initials}</div>
-                <div>
-                  <p className="profile-dd-name">{user?.name}</p>
-                  <p className="profile-dd-email">{user?.email}</p>
-                </div>
-              </div>
-              <div className="profile-dd-divider" />
+            <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl p-2 shadow-2xl space-y-1 z-50 text-xs">
               <button
-                className="profile-dd-item"
-                type="button"
-                onClick={() => { navigate("/settings"); setShowProfile(false); }}
+                onClick={() => { setShowProfile(false); navigate("/settings"); }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition"
               >
-                ⚙ Settings
+                <Settings className="w-4 h-4 text-slate-400" /> Account Settings
               </button>
               <button
-                className="profile-dd-item profile-dd-logout"
-                type="button"
-                onClick={handleLogout}
+                onClick={() => { setShowProfile(false); navigate("/id-card"); }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition"
               >
-                ⏻ Sign out
+                <User className="w-4 h-4 text-slate-400" /> Digital Student ID
+              </button>
+              <div className="border-t border-slate-800 my-1" />
+              <button
+                onClick={() => { logout(); navigate("/login"); }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition font-semibold"
+              >
+                <LogOut className="w-4 h-4" /> Sign Out
               </button>
             </div>
           )}

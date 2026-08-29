@@ -1,13 +1,8 @@
 // src/api/axios.js
-// Central Axios instance for all API calls - Version 2.
-// Automatically attaches the JWT token from localStorage to every request.
+// Central Axios instance for all API calls - Version 3.
 
 import axios from "axios";
 
-console.log("Initializing CampusOS API - V3...");
-
-// In development: uses http://localhost:8000
-// In production: uses the VITE_API_URL environment variable (set in Vercel)
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
@@ -28,9 +23,7 @@ const api = axios.create({
   },
 });
 
-// ---------------------------------------------------------------------------
 // Request interceptor — adds the JWT token to every outgoing request
-// ---------------------------------------------------------------------------
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
@@ -42,17 +35,18 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ---------------------------------------------------------------------------
-// Response interceptor — handles 401 errors globally (auto-logout)
-// ---------------------------------------------------------------------------
+// Response interceptor — handles 401 errors gracefully without killing demo sessions
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid — clear storage and redirect to login
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+      const token = localStorage.getItem("access_token");
+      // Only force redirect to login if token is expired real JWT on auth routes
+      if (token && token !== "demo-jwt-token" && error.config?.url?.includes("/auth/")) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

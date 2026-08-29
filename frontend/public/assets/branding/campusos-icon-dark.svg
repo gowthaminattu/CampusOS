@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="icon-grad-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="icon-accent-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <path d="M 68,15 A 42,42 0 1,0 68,85" stroke="url(#icon-grad-dark)" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M 38,68 L 38,44 A 12,12 0 0,1 62,44 L 62,68" stroke="#F8FAFC" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 50,38 L 50,68" stroke="url(#icon-accent-dark)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 30,44 L 50,26 L 70,44" stroke="url(#icon-grad-dark)" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="68" cy="15" r="6" fill="#38BDF8" />
+  <circle cx="68" cy="85" r="6" fill="#818CF8" />
+  <circle cx="50" cy="26" r="5" fill="#38BDF8" />
+</svg>

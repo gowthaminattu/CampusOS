@@ -6,16 +6,17 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    // Proxy API calls to FastAPI backend (avoids CORS issues in dev)
+    // Proxy API calls to Java Spring Boot backend (avoids CORS issues in dev)
     proxy: {
-      "/auth": "http://localhost:8000",
-      "/hostel": "http://localhost:8000",
-      "/lab": "http://localhost:8000",
-      "/orchestrator": "http://localhost:8000",
-      "/admission": "http://localhost:8000",
-      "/admin": "http://localhost:8000",
-      "/meeting": "http://localhost:8000",
-      "/notification": "http://localhost:8000",
+      "^/auth/": "http://localhost:8000",
+      "^/hostel/": "http://localhost:8000",
+      "^/lab/": "http://localhost:8000",
+      "^/orchestrator/": "http://localhost:8000",
+      "^/admission/": "http://localhost:8000",
+      "^/admin/": "http://localhost:8000",
+      "^/meeting/": "http://localhost:8000",
+      "^/notification/": "http://localhost:8000",
+      "/api": "http://localhost:8000",
     },
   },
 });

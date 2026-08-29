@@ -1,6 +1,9 @@
 /* src/index.css — CampusOS AI Complete Design System */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ========================================================================
    DESIGN TOKENS
@@ -1602,3 +1605,167 @@ textarea.form-input { resize:vertical; min-height:80px; }
   .login-tabs { font-size:12px; }
   .hero-name { font-size:26px; }
 }
+
+/* ========================================================================
+   CAMPUSOS DESIGN SYSTEM 3.0 UTILITIES & ANIMATIONS
+   ======================================================================== */
+
+/* Font utility classes */
+.font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+.font-body { font-family: 'Inter', sans-serif; }
+
+/* Glassmorphism surfaces */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-hover {
+  transition: var(--transition);
+}
+.glass-panel-hover:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+}
+
+.glass-card-glow {
+  position: relative;
+  overflow: hidden;
+}
+.glass-card-glow::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* 3D Flip Card Effect for Student QR ID Card */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Academic Health Radial Ring Animations */
+@keyframes ring-fill {
+  from { stroke-dashoffset: 283; }
+}
+
+.academic-health-ring {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.academic-health-ring-circle {
+  stroke-dasharray: 283;
+  transition: stroke-dashoffset 1s ease-in-out;
+}
+
+/* Command Palette Overlay */
+.cmd-palette-backdrop {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.cmd-palette-modal {
+  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Timeline Components */
+.timeline-track {
+  position: relative;
+}
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Smart Timetable Conflict Flash */
+.timetable-conflict-card {
+  border: 1px solid rgba(244, 63, 94, 0.6) !important;
+  background: rgba(244, 63, 94, 0.1) !important;
+  animation: conflictPulse 2s infinite;
+}
+
+@keyframes conflictPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); }
+}
+
+/* Pulse animation for node dots */
+@keyframes nodePulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+.animate-node-pulse {
+  animation: nodePulse 2s infinite ease-in-out;
+}
+
+/* ========================================================================
+   THEME SYSTEM OVERRIDES
+   ======================================================================== */
+[data-theme="deepdark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #080a0f;
+  --bg-card: rgba(255, 255, 255, 0.02);
+  --bg-card-hover: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent-blue: #06b6d4;
+  --accent-blue-light: #22d3ee;
+}
+
+[data-theme="midnight"] {
+  --bg-primary: #091124;
+  --bg-secondary: #0f1c3a;
+  --bg-card: rgba(30, 58, 138, 0.15);
+  --bg-card-hover: rgba(30, 58, 138, 0.25);
+  --border: rgba(59, 130, 246, 0.25);
+  --accent-blue: #3b82f6;
+  --accent-blue-light: #60a5fa;
+}
+
+[data-theme="cyberpunk"] {
+  --bg-primary: #120326;
+  --bg-secondary: #1d063d;
+  --bg-card: rgba(168, 85, 247, 0.1);
+  --bg-card-hover: rgba(168, 85, 247, 0.2);
+  --border: rgba(217, 70, 239, 0.25);
+  --accent-blue: #d946ef;
+  --accent-blue-light: #f0abfc;
+}
+
+

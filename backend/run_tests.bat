@@ -1,0 +1,3 @@
+@echo off
+echo Running CampusOS 2.0 Java Spring Boot Backend Engine Tests...
+call ..\maven\apache-maven-3.9.6\bin\mvn.cmd test

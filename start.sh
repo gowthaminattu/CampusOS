@@ -1,5 +1,3 @@
-#!/bin/sh
-set -e
-
-cd /app/backend
-exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}
+#!/bin/bash
+cd backend
+../maven/apache-maven-3.9.6/bin/mvn spring-boot:run
