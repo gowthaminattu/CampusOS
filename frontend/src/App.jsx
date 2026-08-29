@@ -1,7 +1,7 @@
 // src/App.jsx
-// Root component — CampusOS 3.0 layout, Command Palette (Ctrl+K), SaaS landing, protected routes.
+// Root component — CampusOS 3.0 layout, Command Palette (Ctrl+K), SaaS landing, protected routes, Error Boundary.
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Component } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Sidebar from "./components/Sidebar";
@@ -40,6 +40,50 @@ import StudentManagement from "./components/StudentManagement";
 import Analytics from "./components/Analytics";
 import AdmissionManagement from "./components/AdmissionManagement";
 import Settings from "./components/Settings";
+
+// ─── Error Boundary ─────────────────────────────────────────────────────────
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("CampusOS Platform Error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 text-center font-sans">
+          <div className="max-w-md w-full glass-panel p-8 rounded-3xl border border-indigo-500/30 space-y-4 shadow-2xl">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl font-bold font-mono">
+              🎓
+            </div>
+            <h1 className="text-xl font-extrabold text-white font-heading">CampusOS Platform</h1>
+            <p className="text-xs text-slate-300 leading-relaxed font-sans">
+              The application encountered a transient session update. Click below to reload the digital workspace.
+            </p>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = "/login";
+              }}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 text-white font-bold text-xs transition shadow-lg shadow-indigo-600/30"
+            >
+              Reload & Launch Session
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // ─── Dashboard Router (Student vs Faculty) ──────────────────────────────────
 function DashboardRouter() {
@@ -124,7 +168,75 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      {/* Core Academic Modules */}
+      {/* Protected Student Success Engines */}
+      <Route path="/student-success" element={
+        <ProtectedRoute>
+          <SidebarLayout><StudentSuccessDashboard /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/employability" element={
+        <ProtectedRoute>
+          <SidebarLayout><StudentSuccessDashboard /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/skill-gap" element={
+        <ProtectedRoute>
+          <SidebarLayout><SkillGapEngine /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/mock-interview" element={
+        <ProtectedRoute>
+          <SidebarLayout><AIMockInterview /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/resume-analyzer" element={
+        <ProtectedRoute>
+          <SidebarLayout><ResumeAnalyzer /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* Placement Drives & Corporate Intelligence */}
+      <Route path="/placement" element={
+        <ProtectedRoute>
+          <SidebarLayout><PlacementDrives /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* Faculty & Staff Intelligence Roster */}
+      <Route path="/faculty-dashboard" element={
+        <ProtectedRoute allowedRoles={["faculty", "staff"]}>
+          <SidebarLayout><FacultyDashboard /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/at-risk-students" element={
+        <ProtectedRoute allowedRoles={["faculty", "staff"]}>
+          <SidebarLayout><AtRiskStudentsViewer /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/students" element={
+        <ProtectedRoute allowedRoles={["faculty", "staff"]}>
+          <SidebarLayout><StudentManagement /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* Operations & Campus Infrastructure */}
+      <Route path="/hostel-booking" element={
+        <ProtectedRoute>
+          <SidebarLayout><HostelBooking /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/lab-booking" element={
+        <ProtectedRoute>
+          <SidebarLayout><LabBooking /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/library" element={
+        <ProtectedRoute>
+          <SidebarLayout><LibrarySystem /></SidebarLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* Core Academic & Assistance Tools */}
       <Route path="/attendance" element={
         <ProtectedRoute>
           <SidebarLayout><Attendance /></SidebarLayout>
@@ -140,18 +252,6 @@ function AppRoutes() {
           <SidebarLayout><Timetable /></SidebarLayout>
         </ProtectedRoute>
       } />
-      <Route path="/chat" element={
-        <ProtectedRoute>
-          <SidebarLayout><AIChat /></SidebarLayout>
-        </ProtectedRoute>
-      } />
-
-      {/* Student & Campus Services */}
-      <Route path="/id-card" element={
-        <ProtectedRoute>
-          <SidebarLayout><QRIDCard /></SidebarLayout>
-        </ProtectedRoute>
-      } />
       <Route path="/fees" element={
         <ProtectedRoute>
           <SidebarLayout><FeeManagement /></SidebarLayout>
@@ -162,57 +262,18 @@ function AppRoutes() {
           <SidebarLayout><Complaints /></SidebarLayout>
         </ProtectedRoute>
       } />
-
-      {/* Career & Placement Suite */}
-      <Route path="/placement" element={
+      <Route path="/id-card" element={
         <ProtectedRoute>
-          <SidebarLayout><PlacementDrives /></SidebarLayout>
+          <SidebarLayout><QRIDCard /></SidebarLayout>
         </ProtectedRoute>
       } />
-      <Route path="/skill-gap" element={
+      <Route path="/ai-chat" element={
         <ProtectedRoute>
-          <SidebarLayout><SkillGapEngine /></SidebarLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/resume-analyzer" element={
-        <ProtectedRoute>
-          <SidebarLayout><ResumeAnalyzer /></SidebarLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/mock-interview" element={
-        <ProtectedRoute>
-          <SidebarLayout><AIMockInterview /></SidebarLayout>
+          <SidebarLayout><AIChat /></SidebarLayout>
         </ProtectedRoute>
       } />
 
-      {/* Resource Allocations */}
-      <Route path="/library" element={
-        <ProtectedRoute>
-          <SidebarLayout><LibrarySystem /></SidebarLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/hostel" element={
-        <ProtectedRoute>
-          <SidebarLayout><HostelBooking /></SidebarLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/lab" element={
-        <ProtectedRoute>
-          <SidebarLayout><LabBooking /></SidebarLayout>
-        </ProtectedRoute>
-      } />
-
-      {/* Staff & Faculty Admin Operations */}
-      <Route path="/at-risk-students" element={
-        <ProtectedRoute allowedRoles={["faculty", "staff"]}>
-          <SidebarLayout><AtRiskStudentsViewer /></SidebarLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/students" element={
-        <ProtectedRoute>
-          <SidebarLayout><StudentManagement /></SidebarLayout>
-        </ProtectedRoute>
-      } />
+      {/* Enterprise Analytics & System Administration */}
       <Route path="/analytics" element={
         <ProtectedRoute allowedRoles={["faculty", "staff"]}>
           <SidebarLayout><Analytics /></SidebarLayout>
@@ -240,17 +301,19 @@ function AppRoutes() {
       } />
 
       {/* Default Catch-all */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
