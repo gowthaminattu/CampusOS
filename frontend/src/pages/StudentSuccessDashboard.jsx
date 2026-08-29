@@ -22,7 +22,7 @@ export default function StudentSuccessDashboard() {
             <Sparkles className="w-3.5 h-3.5 text-sky-400" /> STUDENT COMMAND CENTER
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight font-heading">
-            Good morning, {userName}
+            Welcome back, {userName}
           </h1>
           <p className="text-sm text-slate-300 mt-1">
             Here's what needs your attention today across academics, attendance, and campus services.

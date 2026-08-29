@@ -54,7 +54,7 @@ function StudentDashboard({ user }) {
         <div className="student-hero-bg" />
         <div className="student-hero-content">
           <div className="student-hero-text">
-            <p className="hero-greeting-line">{greeting}, 👋</p>
+            <p className="hero-greeting-line">Welcome back, 👋</p>
             <h1 className="hero-name">{user?.name || "Student"}</h1>
             <p className="hero-meta">
               {user?.department && <span className="hero-meta-chip">{user.department}</span>}
